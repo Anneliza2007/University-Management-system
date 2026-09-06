@@ -1,0 +1,6 @@
+{
+  "name": "University Management Dashboard",
+  "description": "Full-stack university management console powered by Node.js, Express, and Oracle Database with automated schema initialization from uni_schema.txt and uni_entries.txt, complete CRUD operations, and CSV bulk data importing for faculty and facilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

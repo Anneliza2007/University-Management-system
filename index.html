@@ -1,0 +1,3636 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%; margin: 0;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University Management Dashboard</title>
+  <meta name="description" content="University Management Dashboard powered by Node.js, Express, and Oracle Database.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-canvas: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --sidebar-bg: #1e293b;
+      --sidebar-border: #334155;
+      --sidebar-hover: #334155;
+      --border-color: #e2e8f0;
+      --border-focus: #2563eb;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-slate-light: #94a3b8;
+      --brand-primary: #2563eb;
+      --brand-primary-hover: #1d4ed8;
+      --brand-accent: #2563eb;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: var(--font-sans);
+      background-color: var(--bg-canvas);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Overall Layout Shell */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background-color: var(--bg-canvas);
+    }
+
+    /* Sidebar Navigation */
+    aside.sidebar {
+      width: 260px;
+      min-width: 260px;
+      background-color: var(--sidebar-bg);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--sidebar-border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 20;
+    }
+
+    .sidebar-brand {
+      padding: 24px;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+
+    .brand-heading {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+    }
+
+    .brand-badge {
+      width: 32px;
+      height: 32px;
+      background-color: var(--brand-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-slate-light);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-label {
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-slate-light);
+      font-weight: 700;
+      padding: 12px 12px 6px 12px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .tab-btn:hover {
+      background-color: var(--sidebar-hover);
+      color: #ffffff;
+    }
+
+    .tab-btn.active {
+      background-color: var(--brand-primary);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-btn-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tab-btn-icon {
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+    }
+
+    .tab-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background-color: #334155;
+      color: #cbd5e1;
+    }
+
+    .tab-btn.active .tab-badge {
+      background-color: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
+    .sidebar-user {
+      padding: 20px;
+      border-top: 1px solid var(--sidebar-border);
+      margin-top: auto;
+      background-color: rgba(15, 23, 42, 0.2);
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #475569;
+      border: 1px solid #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .user-info p.user-name {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .user-info p.user-role {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    /* Main Content Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 100vh;
+      background-color: var(--bg-canvas);
+    }
+
+    /* Top Header Bar */
+    header.top-header {
+      height: 64px;
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      gap: 16px;
+    }
+
+    .header-left h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1e293b;
+      letter-spacing: -0.01em;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .header-divider {
+      height: 16px;
+      width: 1px;
+      background-color: var(--border-color);
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 8px;
+    }
+
+    /* Content Canvas */
+    .content-canvas {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background-color: var(--bg-surface);
+      padding: 20px 24px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: box-shadow 0.15s ease;
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-slate-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .stat-card-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1e293b;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .stat-card-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    .stat-card-meta.highlight {
+      color: var(--brand-primary);
+    }
+
+    .stat-card-meta.success {
+      color: var(--success);
+    }
+
+    /* Section Views */
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Action Toolbar */
+    .section-toolbar {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 280px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 360px;
+      min-width: 200px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-slate-light);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8.5px 12px 8.5px 34px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-canvas);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+      background-color: var(--bg-surface);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .filter-select {
+      padding: 8.5px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-canvas);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+      background-color: var(--bg-surface);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--brand-primary);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--brand-primary-hover);
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-surface);
+      color: var(--text-secondary);
+      border-color: var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--bg-subtle);
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .btn-danger {
+      background-color: var(--bg-surface);
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger-bg);
+      border-color: #f87171;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Tables */
+    .table-container {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    .data-table th {
+      background-color: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .data-table td {
+      padding: 13px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    /* Badges & Tags */
+    .id-badge {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--brand-primary);
+      background-color: #eff6ff;
+      padding: 2.5px 7px;
+      border-radius: 4px;
+      border: 1px solid #dbeafe;
+    }
+
+    .dept-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .type-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .avatar-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+    }
+
+    .capacity-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .capacity-bar {
+      width: 44px;
+      height: 5px;
+      background-color: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .capacity-fill {
+      height: 100%;
+      background-color: var(--brand-primary);
+      border-radius: 9999px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-size: 15px;
+      color: #1e293b;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      max-width: 380px;
+      margin: 0 auto 16px auto;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      animation: modalSlide 0.15s ease-out;
+    }
+
+    @keyframes modalSlide {
+      from { opacity: 0; transform: scale(0.97) translateY(6px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h2 {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-slate-light);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 4px;
+      line-height: 1;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-close:hover {
+      color: #1e293b;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      background-color: #f8fafc;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    label .req {
+      color: var(--danger);
+      margin-left: 2px;
+    }
+
+    .input-control {
+      width: 100%;
+      padding: 8.5px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--text-primary);
+      transition: border-color 0.15s ease;
+    }
+
+    .input-control:focus {
+      outline: none;
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .input-helper {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Toast System */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 2000;
+      max-width: 360px;
+    }
+
+    .toast {
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background-color: #0f172a;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      animation: toastIn 0.2s ease-out;
+    }
+
+    .toast.success {
+      background-color: #064e3b;
+      border-left: 4px solid #10b981;
+    }
+
+    .toast.error {
+      background-color: #7f1d1d;
+      border-left: 4px solid #ef4444;
+    }
+
+    .toast.info {
+      background-color: #1e3a8a;
+      border-left: 4px solid #3b82f6;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Database Explorer View */
+    .code-preview-card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .code-preview-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .code-box {
+      background-color: #0f172a;
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      max-height: 280px;
+      white-space: pre-wrap;
+    }
+
+    /* Bulk Upload Modal Styles */
+    .bulk-type-selection {
+      margin-bottom: 16px;
+    }
+    .bulk-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-slate);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .bulk-type-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .bulk-type-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background-color: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-slate);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .bulk-type-btn:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    .bulk-type-btn.active {
+      background-color: #eff6ff;
+      border-color: #3b82f6;
+      color: #1d4ed8;
+      box-shadow: 0 0 0 1px #3b82f6;
+    }
+    .bulk-template-box {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .bulk-template-text {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .bulk-template-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-sample-csv {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #2563eb;
+      background-color: #ffffff;
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-sample-csv:hover {
+      background-color: #eff6ff;
+      border-color: #3b82f6;
+    }
+    .bulk-dropzone {
+      border: 2px dashed #cbd5e1;
+      background-color: #fbfcfe;
+      border-radius: var(--radius-lg);
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 16px;
+    }
+    .bulk-dropzone:hover, .bulk-dropzone.dragover {
+      border-color: var(--primary);
+      background-color: #eff6ff;
+    }
+    .dropzone-icon {
+      font-size: 32px;
+      margin-bottom: 6px;
+    }
+    .dropzone-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+    .dropzone-browse {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    .dropzone-hint {
+      font-size: 12px;
+      color: var(--text-slate-light);
+    }
+    .bulk-file-banner {
+      background-color: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .file-banner-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .file-icon {
+      font-size: 22px;
+    }
+    .file-meta {
+      display: flex;
+      flex-direction: column;
+    }
+    .file-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+    .file-info {
+      font-size: 11.5px;
+      color: var(--text-slate-light);
+    }
+    .btn-remove-file {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    .btn-remove-file:hover {
+      background-color: #fee2e2;
+    }
+    .bulk-preview-section {
+      margin-bottom: 16px;
+    }
+    .bulk-preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .bulk-preview-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-slate);
+    }
+    .bulk-status-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .bulk-status-tag.valid {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+    .bulk-status-tag.warning {
+      background-color: #fef9c3;
+      color: #854d0e;
+    }
+    .bulk-preview-table-wrap {
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: #ffffff;
+    }
+    .bulk-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .bulk-table th {
+      background-color: #f8fafc;
+      padding: 8px 12px;
+      font-weight: 600;
+      color: var(--text-slate);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .bulk-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .bulk-validation-notice {
+      margin-top: 8px;
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .bulk-validation-notice.valid {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+    .bulk-validation-notice.warning {
+      background-color: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+    .bulk-results-box {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      margin-bottom: 16px;
+    }
+    .results-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .results-icon {
+      font-size: 28px;
+    }
+    .results-header h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #166534;
+      margin: 0 0 2px 0;
+    }
+    .results-header p {
+      font-size: 12.5px;
+      color: #15803d;
+      margin: 0;
+    }
+    .results-errors-list {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #86efac;
+      font-size: 12px;
+      color: #991b1b;
+    }
+    .results-error-heading {
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .results-errors-list ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 900px) {
+      aside.sidebar {
+        width: 72px;
+        min-width: 72px;
+      }
+      .brand-title-wrap, .brand-sub, .nav-label, .tab-btn span:not(.tab-btn-icon), .tab-badge, .user-info {
+        display: none !important;
+      }
+      .sidebar-brand {
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      .tab-btn {
+        justify-content: center;
+        padding: 12px;
+      }
+      .sidebar-user {
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      header.top-header {
+        padding: 0 16px;
+      }
+      .content-canvas {
+        padding: 20px 16px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-layout {
+        flex-direction: column;
+      }
+      aside.sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .data-table th:nth-child(5),
+      .data-table td:nth-child(5),
+      .data-table th:nth-child(6),
+      .data-table td:nth-child(6) {
+        display: none;
+      }
+    }
+
+    /* Keyboard Shortcut Badges */
+    .shortcut-kbd {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.14);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 1px 5px;
+      line-height: 1.2;
+      margin-left: auto;
+      text-transform: none;
+    }
+    .btn .shortcut-kbd {
+      background: rgba(255, 255, 255, 0.24);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.35);
+      margin-left: 6px;
+      font-size: 10px;
+    }
+
+    /* LocalStorage Auto-save Draft Banner */
+    .draft-notice {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      margin-bottom: 14px;
+    }
+    .draft-notice button.btn-link {
+      background: none;
+      border: none;
+      color: #dc2626;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      margin-left: 8px;
+    }
+    .draft-notice button.btn-link:hover {
+      color: #991b1b;
+    }
+
+    /* ==========================================================================
+       Login Screen Component (admin / 123456)
+       ========================================================================== */
+    .login-page-wrapper {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 20%, #1e293b 0%, #090d16 100%);
+      padding: 24px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      animation: loginFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes loginFadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes shakeAnimation {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-7px); }
+      40%, 80% { transform: translateX(7px); }
+    }
+    .shake {
+      animation: shakeAnimation 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .login-card-header {
+      background: #0f172a;
+      padding: 30px 24px 22px;
+      text-align: center;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .login-brand-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .login-card-header h1 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .login-card-header p {
+      margin: 0;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .login-card-body {
+      padding: 26px 28px 30px;
+    }
+
+    .login-error-alert {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 18px;
+      line-height: 1.4;
+    }
+
+    .login-form-group {
+      margin-bottom: 18px;
+    }
+
+    .login-form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .login-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .login-input-icon {
+      position: absolute;
+      left: 12px;
+      font-size: 15px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .login-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px 0 38px;
+      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      color: #0f172a;
+      background: #ffffff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-sizing: border-box;
+    }
+
+    .login-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .login-password-toggle {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: #64748b;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .login-password-toggle:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .login-options-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      font-size: 13px;
+    }
+
+    .login-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #475569;
+      user-select: none;
+    }
+
+    .login-btn-submit {
+      width: 100%;
+      height: 44px;
+      font-size: 14.5px;
+      font-weight: 600;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s, transform 0.05s;
+    }
+
+    .login-btn-submit:hover {
+      background: #1d4ed8;
+    }
+
+    .login-btn-submit:active {
+      transform: scale(0.99);
+    }
+
+    .login-footer-text {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      margin-left: auto;
+    }
+    .btn-logout:hover {
+      background: rgba(220, 38, 38, 0.25);
+      border-color: rgba(220, 38, 38, 0.5);
+      color: #fca5a5;
+    }
+  </style>
+</head>
+<body>
+  <!-- Standalone Authentication Screen (User: admin | Password: 123456) -->
+  <div class="login-page-wrapper" id="loginScreen">
+    <div class="login-container">
+      <div class="login-card-header">
+        <div class="login-brand-icon" aria-hidden="true">🏛️</div>
+        <h1>University Portal</h1>
+        <p>Administrative Access &bull; Oracle Database Console</p>
+      </div>
+
+      <div class="login-card-body">
+        <!-- Dynamic Error Banner -->
+        <div class="login-error-alert" id="loginErrorAlert">
+          <span>⚠️</span>
+          <span id="loginErrorMsg">Invalid username or password.</span>
+        </div>
+
+        <form id="formLogin">
+          <div class="login-form-group">
+            <label for="loginUsername">Username <span class="req">*</span></label>
+            <div class="login-input-wrap">
+              <span class="login-input-icon">👤</span>
+              <input type="text" id="loginUsername" class="login-input" placeholder="Enter username" required autocomplete="username">
+            </div>
+          </div>
+
+          <div class="login-form-group">
+            <label for="loginPassword">Password <span class="req">*</span></label>
+            <div class="login-input-wrap">
+              <span class="login-input-icon">🔒</span>
+              <input type="password" id="loginPassword" class="login-input" placeholder="Enter password" required autocomplete="current-password">
+              <button type="button" class="login-password-toggle" id="btnTogglePassword" title="Show/Hide Password" aria-label="Toggle password visibility">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div class="login-options-row">
+            <label class="login-checkbox-label">
+              <input type="checkbox" id="loginRememberMe" checked>
+              <span>Keep me signed in</span>
+            </label>
+          </div>
+
+          <button type="submit" class="login-btn-submit" id="btnSubmitLogin">
+            <span>Sign In to Console</span>
+            <span>&rarr;</span>
+          </button>
+
+          <div class="login-footer-text">
+            <span>🔒 Protected Academic Directory &amp; Campus Facility Records</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout" id="appLayout" style="display: none;">
+    <!-- Sidebar: Dark Slate Blue Theme (Professional Polish) -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-heading">
+          <div class="brand-badge" aria-hidden="true">UA</div>
+          <div class="brand-title-wrap">
+            <span>UniAdmin</span>
+            <div class="brand-sub">Education Systems</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-label">Main Navigation</div>
+
+      <nav class="sidebar-nav" aria-label="Main Navigation">
+        <button class="tab-btn active" id="tabTeachers" data-tab="teachers">
+          <div class="tab-btn-title">
+            <span class="tab-btn-icon">👨‍🏫</span>
+            <span>Faculty Members</span>
+          </div>
+          <span class="shortcut-kbd" title="Shortcut: Alt+T">Alt+T</span>
+          <span class="tab-badge" id="tabTeachersCount">0</span>
+        </button>
+
+        <button class="tab-btn" id="tabRooms" data-tab="rooms">
+          <div class="tab-btn-title">
+            <span class="tab-btn-icon">🏢</span>
+            <span>Classrooms &amp; Labs</span>
+          </div>
+          <span class="shortcut-kbd" title="Shortcut: Alt+R">Alt+R</span>
+          <span class="tab-badge" id="tabRoomsCount">0</span>
+        </button>
+
+        <button class="tab-btn" id="tabDbExplorer" data-tab="database">
+          <div class="tab-btn-title">
+            <span class="tab-btn-icon">🗄️</span>
+            <span>Database &amp; Schema</span>
+          </div>
+          <span class="shortcut-kbd" title="Shortcut: Alt+D">Alt+D</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="user-card">
+          <div class="user-avatar" id="sidebarAvatar">AD</div>
+          <div class="user-info">
+            <p class="user-name" id="sidebarUserName">admin</p>
+            <p class="user-role" id="sidebarUserRole">Administrator</p>
+          </div>
+          <button class="btn-logout" id="btnSidebarLogout" title="Sign out of Console">
+            <span>🚪</span> Exit
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main View Area -->
+    <div class="main-wrapper">
+      <!-- Top Header -->
+      <header class="top-header" id="headerSection">
+        <div class="header-left">
+          <h2>University Management Console</h2>
+        </div>
+        <div class="header-right">
+          <span id="dbStatusBadge">Database: Oracle Database</span>
+          <span class="header-divider"></span>
+          <span class="status-indicator">
+            Status: <span class="status-dot"></span> <strong style="color: var(--success);" id="headerSyncText">Operational</strong>
+          </span>
+          <div class="header-actions">
+            <button class="btn btn-secondary btn-sm" id="btnHeaderBulkUpload" title="Bulk import faculty or classrooms from CSV">
+              <span>📤</span> Bulk Upload
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnReseedDb" title="Execute uni_schema.txt and uni_entries.txt to seed Oracle Database">
+              <span>🔄</span> Reseed
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnRefreshAll" title="Refresh all data">
+              <span>⚡</span> Refresh
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btnHeaderLogout" title="Sign out of Console">
+              <span>🚪</span> Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Canvas -->
+      <main class="content-canvas">
+        <!-- Metric Cards -->
+        <section class="stats-grid" id="statsSection">
+          <div class="stat-card" id="statCardTeachers">
+            <div class="stat-card-header">
+              <span>Total Faculty</span>
+              <span>👨‍🏫</span>
+            </div>
+            <div class="stat-card-value" id="statTeachersVal">0</div>
+            <div class="stat-card-meta success" id="statTeachersMeta">Active professors &amp; lecturers</div>
+          </div>
+
+          <div class="stat-card" id="statCardRooms">
+            <div class="stat-card-header">
+              <span>Managed Rooms</span>
+              <span>🏢</span>
+            </div>
+            <div class="stat-card-value" id="statRoomsVal">0</div>
+            <div class="stat-card-meta" id="statRoomsMeta">Facilities across campus buildings</div>
+          </div>
+
+          <div class="stat-card" id="statCardCapacity">
+            <div class="stat-card-header">
+              <span>Seating Capacity</span>
+              <span>🪑</span>
+            </div>
+            <div class="stat-card-value" id="statCapacityVal">0</div>
+            <div class="stat-card-meta">Total combined room occupancy</div>
+          </div>
+
+          <div class="stat-card" id="statCardDepts">
+            <div class="stat-card-header">
+              <span>Academic Departments</span>
+              <span>📚</span>
+            </div>
+            <div class="stat-card-value" id="statDeptsVal">0</div>
+            <div class="stat-card-meta highlight" id="statDeptsMeta">Synced from uni_entries.txt</div>
+          </div>
+        </section>
+
+        <!-- VIEW 1: TEACHERS -->
+        <section class="view-section active" id="sectionTeachers">
+          <div class="section-toolbar">
+            <div class="toolbar-left">
+              <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="teacherSearchInput" class="search-input" placeholder="Search faculty by name, email, department..." autocomplete="off">
+              </div>
+              <select id="teacherDeptFilter" class="filter-select" aria-label="Filter by department">
+                <option value="ALL">All Departments</option>
+              </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="btn btn-secondary" id="btnBulkUploadTeachers" title="Bulk import faculty members via CSV">
+                <span>📤</span> Bulk Upload
+              </button>
+              <button class="btn btn-secondary" id="btnExportTeachersCsv" title="Export current faculty view to CSV">
+                <span>📥</span> Export to CSV
+              </button>
+              <button class="btn btn-primary" id="btnOpenAddTeacher" title="Add Faculty (Shortcut: Alt+N)">
+                <span>+</span> Add Faculty <span class="shortcut-kbd">Alt+N</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table" id="teachersTable">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">ID</th>
+                  <th>Faculty Name</th>
+                  <th>Department</th>
+                  <th>Contact Email</th>
+                  <th>Phone</th>
+                  <th>Hire Date</th>
+                  <th>Salary</th>
+                  <th style="width: 140px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="teachersTbody">
+                <tr>
+                  <td colspan="8" class="empty-state">Loading faculty from Oracle Database...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW 2: ROOMS -->
+        <section class="view-section" id="sectionRooms">
+          <div class="section-toolbar">
+            <div class="toolbar-left">
+              <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="roomSearchInput" class="search-input" placeholder="Search room by number, building, type..." autocomplete="off">
+              </div>
+              <select id="roomBuildingFilter" class="filter-select" aria-label="Filter by building">
+                <option value="ALL">All Buildings</option>
+              </select>
+              <select id="roomTypeFilter" class="filter-select" aria-label="Filter by type">
+                <option value="ALL">All Room Types</option>
+                <option value="Classroom">Classroom</option>
+                <option value="Lecture Hall">Lecture Hall</option>
+                <option value="Computer Lab">Computer Lab</option>
+                <option value="Seminar Room">Seminar Room</option>
+                <option value="Auditorium">Auditorium</option>
+                <option value="Engineering Lab">Engineering Lab</option>
+              </select>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="btn btn-secondary" id="btnBulkUploadRooms" title="Bulk import classrooms/labs via CSV">
+                <span>📤</span> Bulk Upload
+              </button>
+              <button class="btn btn-secondary" id="btnExportRoomsCsv" title="Export current rooms view to CSV">
+                <span>📥</span> Export to CSV
+              </button>
+              <button class="btn btn-primary" id="btnOpenAddRoom">
+                <span>+</span> New Room
+              </button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table" id="roomsTable">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Room ID</th>
+                  <th>Room Number</th>
+                  <th>Building</th>
+                  <th>Room Type</th>
+                  <th>Capacity</th>
+                  <th style="width: 80px; text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="roomsTbody">
+                <tr>
+                  <td colspan="6" class="empty-state">Loading classrooms from Oracle Database...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW 3: DATABASE EXPLORER -->
+        <section class="view-section" id="sectionDatabase">
+          <div class="section-toolbar">
+            <div>
+              <h3 style="font-size: 15px; font-weight: 700; color: #1e293b;">Oracle Database Engine &amp; Schema Manager</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Directly executes Oracle DDL &amp; DML statements (VARCHAR2, NUMBER, TO_DATE, INSERT INTO) against the Oracle Database schema.
+              </p>
+            </div>
+            <button class="btn btn-primary" id="btnReseedFromDbView">
+              <span>🔄</span> Re-execute DDL &amp; DML Seeding
+            </button>
+          </div>
+
+          <div class="code-preview-card">
+            <h3>📄 Oracle Schema DDL (uni_schema.txt)</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+              Native Oracle Data Definition Language: DEPARTMENT, TEACHER, and ROOM tables with constraints and primary keys.
+            </p>
+            <pre class="code-box" id="schemaRawCode">Loading uni_schema.txt...</pre>
+          </div>
+
+          <div class="code-preview-card">
+            <h3>📄 Oracle Entries Seed Source (uni_entries.txt)</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">
+              Native Oracle Data Manipulation Language: TO_DATE('YYYY-MM-DD', 'YYYY-MM-DD') conversions, relational foreign keys, and records.
+            </p>
+            <pre class="code-box" id="entriesRawCode">Loading uni_entries.txt...</pre>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD TEACHER -->
+  <div class="modal-backdrop" id="modalAddTeacher" role="dialog" aria-modal="true" aria-labelledby="modalTeacherTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalTeacherTitle">Add New Faculty Member</h2>
+        <button type="button" class="btn-close" id="btnCloseTeacherModal" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="formAddTeacher">
+        <div class="modal-body">
+          <div class="draft-notice" id="teacherDraftNotice" style="display: none;">
+            <span>📝 Auto-saved draft restored from previous session</span>
+            <button type="button" class="btn-link" id="btnClearTeacherDraft">Discard Draft</button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputTeacherFirst">First Name <span class="req">*</span></label>
+              <input type="text" id="inputTeacherFirst" class="input-control" placeholder="e.g. Alan" required
+                     pattern="^[A-Za-z\s.'-]{2,50}$"
+                     maxlength="50"
+                     title="First name must be 2 to 50 characters (letters, spaces, dots, hyphens, and apostrophes only)">
+            </div>
+            <div class="form-group">
+              <label for="inputTeacherLast">Last Name <span class="req">*</span></label>
+              <input type="text" id="inputTeacherLast" class="input-control" placeholder="e.g. Turing" required
+                     pattern="^[A-Za-z\s.'-]{2,50}$"
+                     maxlength="50"
+                     title="Last name must be 2 to 50 characters (letters, spaces, dots, hyphens, and apostrophes only)">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputTeacherDept">Department <span class="req">*</span></label>
+            <input type="text" id="inputTeacherDept" class="input-control" list="deptListOptions" placeholder="e.g. Computer Science" required
+                   pattern="^[A-Za-z0-9\s.&'-]{2,60}$"
+                   maxlength="60"
+                   title="Department must be 2 to 60 characters (letters, digits, and standard punctuation)">
+            <datalist id="deptListOptions"></datalist>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputTeacherEmail">Email Address</label>
+              <input type="email" id="inputTeacherEmail" class="input-control" placeholder="Optional (e.g. a.turing@university.edu)"
+                     pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                     maxlength="100"
+                     title="Please enter a valid email address (e.g. name@university.edu)">
+            </div>
+            <div class="form-group">
+              <label for="inputTeacherPhone">Phone Number</label>
+              <input type="tel" id="inputTeacherPhone" class="input-control" placeholder="e.g. 555-0199 or (555) 012-3456"
+                     pattern="^(\+?[0-9]{1,3}[-.\s]?)?(\(?[0-9]{3}\)?[-.\s]?)?[0-9]{3}[-.\s]?[0-9]{4}$"
+                     maxlength="25"
+                     title="Valid phone format: e.g. 555-0199, (555) 012-3456, or +1-555-0199">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputTeacherHireDate">Hire Date</label>
+              <input type="date" id="inputTeacherHireDate" class="input-control" min="1950-01-01" max="2099-12-31">
+            </div>
+            <div class="form-group">
+              <label for="inputTeacherSalary">Annual Salary (₹)</label>
+              <input type="number" id="inputTeacherSalary" class="input-control" placeholder="85000" min="1000" max="5000000" step="100"
+                     title="Annual salary between ₹1,000 and ₹5,000,000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputTeacherId">Teacher ID (Optional)</label>
+            <input type="number" id="inputTeacherId" class="input-control" placeholder="Leave empty for auto-increment ID" min="1" max="999999"
+                   title="Positive integer ID (e.g. 1001-999999)">
+            <div class="input-helper">Will automatically increment MAX(TEACHER_ID) + 1 if left empty.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelTeacherModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitTeacher">Save Faculty</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD ROOM -->
+  <div class="modal-backdrop" id="modalAddRoom" role="dialog" aria-modal="true" aria-labelledby="modalRoomTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modalRoomTitle">Add New Classroom / Lab</h2>
+        <button type="button" class="btn-close" id="btnCloseRoomModal" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="formAddRoom">
+        <div class="modal-body">
+          <div class="draft-notice" id="roomDraftNotice" style="display: none;">
+            <span>📝 Auto-saved draft restored from previous session</span>
+            <button type="button" class="btn-link" id="btnClearRoomDraft">Discard Draft</button>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputRoomNumber">Room Number <span class="req">*</span></label>
+              <input type="text" id="inputRoomNumber" class="input-control" placeholder="e.g. 101A or Lab 4" required
+                     pattern="^[A-Za-z0-9\s\-#.]{1,20}$"
+                     maxlength="20"
+                     title="Room number: 1-20 alphanumeric characters, hyphens, dots, or # (e.g. 101A, Lab 12)">
+            </div>
+            <div class="form-group">
+              <label for="inputRoomBuilding">Building <span class="req">*</span></label>
+              <input type="text" id="inputRoomBuilding" class="input-control" list="buildingListOptions" placeholder="e.g. Turing Hall" required
+                     pattern="^[A-Za-z0-9\s.'-]{2,50}$"
+                     maxlength="50"
+                     title="Building name: 2-50 characters (e.g. Turing Hall)">
+              <datalist id="buildingListOptions"></datalist>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputRoomType">Room Type <span class="req">*</span></label>
+              <select id="inputRoomType" class="input-control" required>
+                <option value="Classroom">Classroom</option>
+                <option value="Lecture Hall">Lecture Hall</option>
+                <option value="Computer Lab">Computer Lab</option>
+                <option value="Seminar Room">Seminar Room</option>
+                <option value="Auditorium">Auditorium</option>
+                <option value="Engineering Lab">Engineering Lab</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="inputRoomCapacity">Seating Capacity <span class="req">*</span></label>
+              <input type="number" id="inputRoomCapacity" class="input-control" placeholder="40" min="1" max="2000" step="1" required
+                     title="Seating capacity must be a positive integer between 1 and 2,000">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="inputRoomId">Room ID (Optional)</label>
+            <input type="number" id="inputRoomId" class="input-control" placeholder="Leave empty for auto-increment ID" min="1" max="999999"
+                   title="Positive integer ID (e.g. 201-999999)">
+            <div class="input-helper">Will automatically increment MAX(ROOM_ID) + 1 if left empty.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelRoomModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitRoom">Save Room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRM DELETE -->
+  <div class="modal-backdrop" id="modalConfirmDelete" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 420px;">
+      <div class="modal-header">
+        <h2>Confirm Deletion</h2>
+        <button type="button" class="btn-close" id="btnCloseDeleteModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteModalMessage" style="font-size: 13.5px; color: var(--text-secondary);">
+          Are you sure you want to delete this record from the Oracle Database?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelDelete">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmDelete">Delete Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: BULK UPLOAD -->
+  <div class="modal-backdrop" id="modalBulkUpload" role="dialog" aria-modal="true" aria-labelledby="modalBulkTitle">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalBulkTitle">Bulk Upload via CSV</h2>
+          <p style="font-size: 12px; color: var(--text-slate-light); margin-top: 2px;">
+            Import multiple faculty members or classrooms directly into the database
+          </p>
+        </div>
+        <button type="button" class="btn-close" id="btnCloseBulkModal" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Target Type Selection -->
+        <div class="bulk-type-selection">
+          <label class="bulk-label">Select Target Dataset:</label>
+          <div class="bulk-type-buttons">
+            <button type="button" class="bulk-type-btn active" id="btnBulkTypeTeachers" data-type="teachers">
+              <span>👨‍🏫</span> Faculty Members (TEACHER)
+            </button>
+            <button type="button" class="bulk-type-btn" id="btnBulkTypeRooms" data-type="rooms">
+              <span>🏢</span> Classrooms &amp; Labs (ROOM)
+            </button>
+          </div>
+        </div>
+
+        <!-- Sample Templates Banner -->
+        <div class="bulk-template-box">
+          <div class="bulk-template-text">
+            <span>💡</span>
+            <span>Need sample CSV files with matching column headers?</span>
+          </div>
+          <div class="bulk-template-actions">
+            <button type="button" class="btn-sample-csv" id="btnDownloadTeacherTemplate">
+              <span>📄</span> Faculty Template
+            </button>
+            <button type="button" class="btn-sample-csv" id="btnDownloadRoomTemplate">
+              <span>📄</span> Rooms Template
+            </button>
+          </div>
+        </div>
+
+        <!-- Drag & Drop Upload Zone -->
+        <div class="bulk-dropzone" id="bulkDropzone">
+          <input type="file" id="bulkFileInput" accept=".csv,text/csv,text/plain" style="display: none;">
+          <div class="dropzone-content" id="dropzoneContent">
+            <div class="dropzone-icon">📁</div>
+            <div class="dropzone-title">Drag &amp; drop your CSV file here, or <span class="dropzone-browse">browse</span></div>
+            <div class="dropzone-hint">Supports .csv files with header row (Comma-separated values)</div>
+          </div>
+        </div>
+
+        <!-- Selected File Banner -->
+        <div class="bulk-file-banner" id="bulkFileBanner" style="display: none;">
+          <div class="file-banner-left">
+            <span class="file-icon">📊</span>
+            <div class="file-meta">
+              <span class="file-name" id="bulkFileName">data.csv</span>
+              <span class="file-info" id="bulkFileInfo">0 KB &bull; 0 records detected</span>
+            </div>
+          </div>
+          <button type="button" class="btn-remove-file" id="btnRemoveBulkFile" title="Remove selected file">&times; Remove</button>
+        </div>
+
+        <!-- Preview & Validation Section -->
+        <div class="bulk-preview-section" id="bulkPreviewSection" style="display: none;">
+          <div class="bulk-preview-header">
+            <span class="bulk-preview-title" id="bulkPreviewTitle">Preview Data (First 5 Rows)</span>
+            <span class="bulk-status-tag valid" id="bulkStatusTag">Valid</span>
+          </div>
+          <div class="bulk-preview-table-wrap">
+            <table class="bulk-table" id="bulkPreviewTable">
+              <thead id="bulkPreviewThead"></thead>
+              <tbody id="bulkPreviewTbody"></tbody>
+            </table>
+          </div>
+          <div class="bulk-validation-notice valid" id="bulkValidationNotice"></div>
+        </div>
+
+        <!-- Results / Summary View -->
+        <div class="bulk-results-box" id="bulkResultsBox" style="display: none;">
+          <div class="results-header" id="bulkResultsHeader">
+            <span class="results-icon">🎉</span>
+            <div>
+              <h4 id="bulkResultsTitle">Import Successful!</h4>
+              <p id="bulkResultsSubtitle">All records successfully added to the database.</p>
+            </div>
+          </div>
+          <div class="results-errors-list" id="bulkResultsErrors" style="display: none;">
+            <div class="results-error-heading">The following rows had issues:</div>
+            <ul id="bulkErrorsUl"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" id="bulkModalFooter">
+        <button type="button" class="btn btn-secondary" id="btnCancelBulkModal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btnExecuteBulkImport" disabled>
+          <span>🚀</span> Start Import
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- VANILLA JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Application State
+      const state = {
+        teachers: [],
+        rooms: [],
+        departments: [],
+        buildings: [],
+        stats: null,
+        activeTab: 'teachers',
+        deleteTarget: null,
+        editingTeacherId: null,
+        isAuthenticated: false,
+        user: null
+      };
+
+      // DOM Elements
+      const elements = {
+        loginScreen: document.getElementById('loginScreen'),
+        appLayout: document.getElementById('appLayout'),
+        formLogin: document.getElementById('formLogin'),
+        loginUsername: document.getElementById('loginUsername'),
+        loginPassword: document.getElementById('loginPassword'),
+        loginRememberMe: document.getElementById('loginRememberMe'),
+        loginErrorAlert: document.getElementById('loginErrorAlert'),
+        loginErrorMsg: document.getElementById('loginErrorMsg'),
+        btnTogglePassword: document.getElementById('btnTogglePassword'),
+        btnAutoFillDemo: document.getElementById('btnAutoFillDemo'),
+        btnSubmitLogin: document.getElementById('btnSubmitLogin'),
+        btnHeaderLogout: document.getElementById('btnHeaderLogout'),
+        btnSidebarLogout: document.getElementById('btnSidebarLogout'),
+        sidebarUserName: document.getElementById('sidebarUserName'),
+        sidebarUserRole: document.getElementById('sidebarUserRole'),
+        sidebarAvatar: document.getElementById('sidebarAvatar'),
+        tabBtns: document.querySelectorAll('.tab-btn'),
+        viewSections: document.querySelectorAll('.view-section'),
+        statTeachersVal: document.getElementById('statTeachersVal'),
+        statRoomsVal: document.getElementById('statRoomsVal'),
+        statCapacityVal: document.getElementById('statCapacityVal'),
+        statDeptsVal: document.getElementById('statDeptsVal'),
+        tabTeachersCount: document.getElementById('tabTeachersCount'),
+        tabRoomsCount: document.getElementById('tabRoomsCount'),
+        teachersTbody: document.getElementById('teachersTbody'),
+        roomsTbody: document.getElementById('roomsTbody'),
+        teacherSearchInput: document.getElementById('teacherSearchInput'),
+        teacherDeptFilter: document.getElementById('teacherDeptFilter'),
+        roomSearchInput: document.getElementById('roomSearchInput'),
+        roomBuildingFilter: document.getElementById('roomBuildingFilter'),
+        roomTypeFilter: document.getElementById('roomTypeFilter'),
+        deptListOptions: document.getElementById('deptListOptions'),
+        buildingListOptions: document.getElementById('buildingListOptions'),
+        modalAddTeacher: document.getElementById('modalAddTeacher'),
+        modalAddRoom: document.getElementById('modalAddRoom'),
+        modalConfirmDelete: document.getElementById('modalConfirmDelete'),
+        formAddTeacher: document.getElementById('formAddTeacher'),
+        formAddRoom: document.getElementById('formAddRoom'),
+        modalTeacherTitle: document.getElementById('modalTeacherTitle'),
+        btnSubmitTeacher: document.getElementById('btnSubmitTeacher'),
+        inputTeacherFirst: document.getElementById('inputTeacherFirst'),
+        inputTeacherLast: document.getElementById('inputTeacherLast'),
+        inputTeacherDept: document.getElementById('inputTeacherDept'),
+        inputTeacherEmail: document.getElementById('inputTeacherEmail'),
+        inputTeacherPhone: document.getElementById('inputTeacherPhone'),
+        inputTeacherHireDate: document.getElementById('inputTeacherHireDate'),
+        inputTeacherSalary: document.getElementById('inputTeacherSalary'),
+        inputTeacherId: document.getElementById('inputTeacherId'),
+        teacherDraftNotice: document.getElementById('teacherDraftNotice'),
+        btnClearTeacherDraft: document.getElementById('btnClearTeacherDraft'),
+        roomDraftNotice: document.getElementById('roomDraftNotice'),
+        btnClearRoomDraft: document.getElementById('btnClearRoomDraft'),
+        inputRoomNumber: document.getElementById('inputRoomNumber'),
+        inputRoomBuilding: document.getElementById('inputRoomBuilding'),
+        inputRoomType: document.getElementById('inputRoomType'),
+        inputRoomCapacity: document.getElementById('inputRoomCapacity'),
+        inputRoomId: document.getElementById('inputRoomId'),
+        btnOpenAddTeacher: document.getElementById('btnOpenAddTeacher'),
+        btnOpenAddRoom: document.getElementById('btnOpenAddRoom'),
+        btnExportTeachersCsv: document.getElementById('btnExportTeachersCsv'),
+        btnExportRoomsCsv: document.getElementById('btnExportRoomsCsv'),
+        btnCloseTeacherModal: document.getElementById('btnCloseTeacherModal'),
+        btnCancelTeacherModal: document.getElementById('btnCancelTeacherModal'),
+        btnCloseRoomModal: document.getElementById('btnCloseRoomModal'),
+        btnCancelRoomModal: document.getElementById('btnCancelRoomModal'),
+        btnConfirmDelete: document.getElementById('btnConfirmDelete'),
+        btnCancelDelete: document.getElementById('btnCancelDelete'),
+        btnCloseDeleteModal: document.getElementById('btnCloseDeleteModal'),
+        deleteModalMessage: document.getElementById('deleteModalMessage'),
+        btnReseedDb: document.getElementById('btnReseedDb'),
+        btnReseedFromDbView: document.getElementById('btnReseedFromDbView'),
+        btnRefreshAll: document.getElementById('btnRefreshAll'),
+        toastContainer: document.getElementById('toastContainer'),
+        schemaRawCode: document.getElementById('schemaRawCode'),
+        entriesRawCode: document.getElementById('entriesRawCode'),
+        dbStatusBadge: document.getElementById('dbStatusBadge'),
+        btnHeaderBulkUpload: document.getElementById('btnHeaderBulkUpload'),
+        btnBulkUploadTeachers: document.getElementById('btnBulkUploadTeachers'),
+        btnBulkUploadRooms: document.getElementById('btnBulkUploadRooms'),
+        modalBulkUpload: document.getElementById('modalBulkUpload'),
+        modalBulkTitle: document.getElementById('modalBulkTitle'),
+        btnCloseBulkModal: document.getElementById('btnCloseBulkModal'),
+        btnCancelBulkModal: document.getElementById('btnCancelBulkModal'),
+        btnBulkTypeTeachers: document.getElementById('btnBulkTypeTeachers'),
+        btnBulkTypeRooms: document.getElementById('btnBulkTypeRooms'),
+        btnDownloadTeacherTemplate: document.getElementById('btnDownloadTeacherTemplate'),
+        btnDownloadRoomTemplate: document.getElementById('btnDownloadRoomTemplate'),
+        bulkDropzone: document.getElementById('bulkDropzone'),
+        bulkFileInput: document.getElementById('bulkFileInput'),
+        bulkFileBanner: document.getElementById('bulkFileBanner'),
+        bulkFileName: document.getElementById('bulkFileName'),
+        bulkFileInfo: document.getElementById('bulkFileInfo'),
+        btnRemoveBulkFile: document.getElementById('btnRemoveBulkFile'),
+        bulkPreviewSection: document.getElementById('bulkPreviewSection'),
+        bulkPreviewTitle: document.getElementById('bulkPreviewTitle'),
+        bulkStatusTag: document.getElementById('bulkStatusTag'),
+        bulkPreviewTable: document.getElementById('bulkPreviewTable'),
+        bulkPreviewThead: document.getElementById('bulkPreviewThead'),
+        bulkPreviewTbody: document.getElementById('bulkPreviewTbody'),
+        bulkValidationNotice: document.getElementById('bulkValidationNotice'),
+        bulkResultsBox: document.getElementById('bulkResultsBox'),
+        bulkResultsTitle: document.getElementById('bulkResultsTitle'),
+        bulkResultsSubtitle: document.getElementById('bulkResultsSubtitle'),
+        bulkResultsErrors: document.getElementById('bulkResultsErrors'),
+        bulkErrorsUl: document.getElementById('bulkErrorsUl'),
+        btnExecuteBulkImport: document.getElementById('btnExecuteBulkImport'),
+        bulkModalFooter: document.getElementById('bulkModalFooter')
+      };
+
+      // Toast Notification Helper
+      function showToast(message, type = 'info', duration = 3500) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <span>${message}</span>
+          <button style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;" aria-label="Dismiss">&times;</button>
+        `;
+        const dismissBtn = toast.querySelector('button');
+        dismissBtn.addEventListener('click', () => toast.remove());
+
+        elements.toastContainer.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.2s';
+            setTimeout(() => toast.remove(), 200);
+          }
+        }, duration);
+      }
+
+      // Format currency (Rupees)
+      function formatSalary(amount) {
+        if (amount === undefined || amount === null || isNaN(amount)) return '₹0';
+        return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+      }
+
+      // Escape HTML to prevent XSS
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // CSV Export Utility for Current Views
+      function exportToCsv(filename, columns, data) {
+        if (!data || data.length === 0) {
+          showToast('No records available in the current view to export', 'info');
+          return;
+        }
+
+        const escapeCsvValue = (val) => {
+          if (val === null || val === undefined) return '""';
+          const stringVal = String(val);
+          const escaped = stringVal.replace(/"/g, '""');
+          return `"${escaped}"`;
+        };
+
+        const headerLine = columns.map(col => escapeCsvValue(col.label)).join(',');
+        const dataLines = data.map(item => {
+          return columns.map(col => escapeCsvValue(col.getValue(item))).join(',');
+        });
+
+        // Add UTF-8 BOM (\uFEFF) for Excel / spreadsheet software compatibility
+        const csvContent = '\uFEFF' + [headerLine, ...dataLines].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast(`Exported ${data.length} record${data.length === 1 ? '' : 's'} to ${filename}`, 'success');
+      }
+
+      function handleExportTeachers() {
+        const timestamp = new Date().toISOString().split('T')[0];
+        const columns = [
+          { label: 'TEACHER_ID', getValue: t => t.TEACHER_ID },
+          { label: 'FIRST_NAME', getValue: t => t.FIRST_NAME || '' },
+          { label: 'LAST_NAME', getValue: t => t.LAST_NAME || '' },
+          { label: 'DEPARTMENT', getValue: t => t.DEPARTMENT || '' },
+          { label: 'EMAIL', getValue: t => t.EMAIL || '' },
+          { label: 'PHONE', getValue: t => t.PHONE || '' },
+          { label: 'HIRE_DATE', getValue: t => t.HIRE_DATE || '' },
+          { label: 'SALARY', getValue: t => (t.SALARY !== null && t.SALARY !== undefined) ? t.SALARY : '' }
+        ];
+        exportToCsv(`teachers_export_${timestamp}.csv`, columns, state.teachers);
+      }
+
+      function handleExportRooms() {
+        const timestamp = new Date().toISOString().split('T')[0];
+        const columns = [
+          { label: 'ROOM_ID', getValue: r => r.ROOM_ID },
+          { label: 'ROOM_NUMBER', getValue: r => r.ROOM_NUMBER || '' },
+          { label: 'BUILDING', getValue: r => r.BUILDING || '' },
+          { label: 'ROOM_TYPE', getValue: r => r.ROOM_TYPE || 'Classroom' },
+          { label: 'CAPACITY', getValue: r => (r.CAPACITY !== null && r.CAPACITY !== undefined) ? r.CAPACITY : '' }
+        ];
+        exportToCsv(`rooms_export_${timestamp}.csv`, columns, state.rooms);
+      }
+
+      // Switch Active Tab
+      function setActiveTab(tabName) {
+        state.activeTab = tabName;
+        elements.tabBtns.forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+        });
+        elements.viewSections.forEach(section => {
+          section.classList.toggle('active', section.id === `section${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+        });
+
+        if (tabName === 'database') {
+          loadDatabaseFiles();
+        }
+      }
+
+      // API Call: Fetch Teachers
+      async function loadTeachers() {
+        try {
+          const query = elements.teacherSearchInput.value.trim();
+          const dept = elements.teacherDeptFilter.value;
+          const params = new URLSearchParams();
+          if (query) params.append('q', query);
+          if (dept && dept !== 'ALL') params.append('department', dept);
+
+          const res = await fetch(`/api/teachers?${params.toString()}`);
+          const json = await res.json();
+          if (json.success) {
+            state.teachers = json.data;
+            renderTeachers();
+            elements.tabTeachersCount.textContent = json.count;
+          } else {
+            showToast(json.error || 'Failed loading teachers', 'error');
+          }
+        } catch (err) {
+          console.error('Error fetching teachers:', err);
+          showToast('Network error while loading teachers', 'error');
+        }
+      }
+
+      // Render Teachers Table
+      function renderTeachers() {
+        if (!state.teachers || state.teachers.length === 0) {
+          elements.teachersTbody.innerHTML = `
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <div class="empty-state-icon">👨‍🏫</div>
+                  <h3>No Faculty Members Found</h3>
+                  <p>No records matched your search or the database has no entries.</p>
+                  <button class="btn btn-primary btn-sm" onclick="document.getElementById('btnOpenAddTeacher').click()">
+                    + Add Faculty
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const rowsHtml = state.teachers.map(t => {
+          const initials = ((t.FIRST_NAME?.[0] || '') + (t.LAST_NAME?.[0] || '')).toUpperCase();
+          return `
+            <tr>
+              <td><span class="id-badge">${escapeHtml(t.TEACHER_ID)}</span></td>
+              <td>
+                <div class="avatar-wrapper">
+                  <div class="avatar">${escapeHtml(initials)}</div>
+                  <div>
+                    <strong style="color: #0f172a; font-weight: 600;">${escapeHtml(t.FIRST_NAME)} ${escapeHtml(t.LAST_NAME)}</strong>
+                  </div>
+                </div>
+              </td>
+              <td><span class="dept-pill">${escapeHtml(t.DEPARTMENT || 'General')}</span></td>
+              <td>
+                <a href="mailto:${escapeHtml(t.EMAIL)}" style="color: var(--brand-primary); text-decoration: none;">
+                  ${escapeHtml(t.EMAIL || '—')}
+                </a>
+              </td>
+              <td style="color: var(--text-muted);">${escapeHtml(t.PHONE || '—')}</td>
+              <td style="color: var(--text-muted);">${escapeHtml(t.HIRE_DATE || '—')}</td>
+              <td style="font-family: var(--font-mono); font-weight: 600; color: #1e293b;">${formatSalary(t.SALARY)}</td>
+              <td style="text-align: right; white-space: nowrap;">
+                <div style="display: inline-flex; gap: 6px; justify-content: flex-end;">
+                  <button class="btn btn-secondary btn-sm" data-action="edit-teacher" data-id="${t.TEACHER_ID}" title="Edit faculty member">
+                    ✏️ Edit
+                  </button>
+                  <button class="btn btn-danger btn-sm" data-action="delete-teacher" data-id="${t.TEACHER_ID}" data-name="${escapeHtml(t.FIRST_NAME + ' ' + t.LAST_NAME)}" title="Delete record">
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        elements.teachersTbody.innerHTML = rowsHtml;
+      }
+
+      // API Call: Fetch Rooms
+      async function loadRooms() {
+        try {
+          const query = elements.roomSearchInput.value.trim();
+          const building = elements.roomBuildingFilter.value;
+          const roomType = elements.roomTypeFilter.value;
+          const params = new URLSearchParams();
+          if (query) params.append('q', query);
+          if (building && building !== 'ALL') params.append('building', building);
+          if (roomType && roomType !== 'ALL') params.append('roomType', roomType);
+
+          const res = await fetch(`/api/rooms?${params.toString()}`);
+          const json = await res.json();
+          if (json.success) {
+            state.rooms = json.data;
+            renderRooms();
+            elements.tabRoomsCount.textContent = json.count;
+          } else {
+            showToast(json.error || 'Failed loading rooms', 'error');
+          }
+        } catch (err) {
+          console.error('Error fetching rooms:', err);
+          showToast('Network error while loading rooms', 'error');
+        }
+      }
+
+      // Render Rooms Table
+      function renderRooms() {
+        if (!state.rooms || state.rooms.length === 0) {
+          elements.roomsTbody.innerHTML = `
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-state-icon">🏢</div>
+                  <h3>No Rooms Found</h3>
+                  <p>No room records matched your filters.</p>
+                  <button class="btn btn-primary btn-sm" onclick="document.getElementById('btnOpenAddRoom').click()">
+                    + Add New Room
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const maxCap = Math.max(...state.rooms.map(r => r.CAPACITY || 1), 100);
+
+        const rowsHtml = state.rooms.map(r => {
+          const capPercent = Math.min(Math.round(((r.CAPACITY || 0) / maxCap) * 100), 100);
+          return `
+            <tr>
+              <td><span class="id-badge">${escapeHtml(r.ROOM_ID)}</span></td>
+              <td><strong style="font-family: var(--font-mono); font-size: 14px; color: var(--brand-primary);">${escapeHtml(r.ROOM_NUMBER)}</strong></td>
+              <td style="font-weight: 500;">${escapeHtml(r.BUILDING)}</td>
+              <td><span class="type-pill">${escapeHtml(r.ROOM_TYPE || 'Classroom')}</span></td>
+              <td>
+                <div class="capacity-badge">
+                  <span style="font-family: var(--font-mono); font-weight: 600;">${escapeHtml(r.CAPACITY)} seats</span>
+                  <div class="capacity-bar" title="${r.CAPACITY} seats">
+                    <div class="capacity-fill" style="width: ${capPercent}%;"></div>
+                  </div>
+                </div>
+              </td>
+              <td style="text-align: right;">
+                <button class="btn btn-danger btn-sm" data-action="delete-room" data-id="${r.ROOM_ID}" data-name="${escapeHtml(r.ROOM_NUMBER + ' (' + r.BUILDING + ')') }">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        elements.roomsTbody.innerHTML = rowsHtml;
+      }
+
+      // API Call: Fetch Stats and Metadata
+      async function loadStatsAndFilters() {
+        try {
+          const [statsRes, deptRes, bldgRes] = await Promise.all([
+            fetch('/api/stats'),
+            fetch('/api/departments'),
+            fetch('/api/buildings')
+          ]);
+
+          const statsJson = await statsRes.json();
+          if (statsJson.success) {
+            state.stats = statsJson.stats;
+            elements.statTeachersVal.textContent = state.stats.totalTeachers;
+            elements.statRoomsVal.textContent = state.stats.totalRooms;
+            elements.statCapacityVal.textContent = Number(state.stats.totalCapacity).toLocaleString();
+            elements.statDeptsVal.textContent = state.stats.departmentsCount;
+            if (elements.dbStatusBadge && state.stats.databaseType) {
+              elements.dbStatusBadge.textContent = 'Database: ' + state.stats.databaseType;
+            }
+          }
+
+          const deptJson = await deptRes.json();
+          if (deptJson.success) {
+            state.departments = deptJson.departments;
+            updateDeptDropdowns();
+          }
+
+          const bldgJson = await bldgRes.json();
+          if (bldgJson.success) {
+            state.buildings = bldgJson.buildings;
+            updateBuildingDropdowns();
+          }
+        } catch (err) {
+          console.error('Error fetching statistics:', err);
+        }
+      }
+
+      // Populate Department Filter and Datalist
+      function updateDeptDropdowns() {
+        const currentSelected = elements.teacherDeptFilter.value;
+        let filterHtml = '<option value="ALL">All Departments</option>';
+        let datalistHtml = '';
+
+        state.departments.forEach(dept => {
+          filterHtml += `<option value="${escapeHtml(dept)}">${escapeHtml(dept)}</option>`;
+          datalistHtml += `<option value="${escapeHtml(dept)}">`;
+        });
+
+        elements.teacherDeptFilter.innerHTML = filterHtml;
+        elements.teacherDeptFilter.value = currentSelected;
+        elements.deptListOptions.innerHTML = datalistHtml;
+      }
+
+      // Populate Building Filter and Datalist
+      function updateBuildingDropdowns() {
+        const currentSelected = elements.roomBuildingFilter.value;
+        let filterHtml = '<option value="ALL">All Buildings</option>';
+        let datalistHtml = '';
+
+        state.buildings.forEach(bldg => {
+          filterHtml += `<option value="${escapeHtml(bldg)}">${escapeHtml(bldg)}</option>`;
+          datalistHtml += `<option value="${escapeHtml(bldg)}">`;
+        });
+
+        elements.roomBuildingFilter.innerHTML = filterHtml;
+        elements.roomBuildingFilter.value = currentSelected;
+        elements.buildingListOptions.innerHTML = datalistHtml;
+      }
+
+      // API Call: Fetch schema and entries file content for Database Explorer
+      async function loadDatabaseFiles() {
+        try {
+          const res = await fetch('/api/database/files');
+          const json = await res.json();
+          if (json.success) {
+            elements.schemaRawCode.textContent = json.schema || '(No schema content found)';
+            elements.entriesRawCode.textContent = json.entries || '(No entries content found)';
+          }
+        } catch (err) {
+          elements.schemaRawCode.textContent = 'Error loading schema file.';
+          elements.entriesRawCode.textContent = 'Error loading entries file.';
+        }
+      }
+
+      // API Call: Reseed Database
+      async function triggerReseed() {
+        if (!confirm('Re-seed the Oracle Database schema and entries from uni_schema.txt and uni_entries.txt? Any unsaved custom records may be replaced.')) {
+          return;
+        }
+
+        try {
+          showToast('Executing schema DDL and seeding Oracle Database...', 'info');
+          const res = await fetch('/api/setup', { method: 'POST' });
+          const json = await res.json();
+          if (json.success) {
+            showToast(json.message || 'Oracle Database successfully initialized and seeded!', 'success');
+            await refreshAll();
+          } else {
+            showToast(json.error || 'Reseeding failed', 'error');
+          }
+        } catch (err) {
+          showToast('Failed communicating with setup endpoint', 'error');
+        }
+      }
+
+      // Refresh all views
+      async function refreshAll() {
+        await Promise.all([
+          loadTeachers(),
+          loadRooms(),
+          loadStatsAndFilters()
+        ]);
+      }
+
+      // Delete Handler Dispatcher
+      function openDeleteModal(type, id, label) {
+        state.deleteTarget = { type, id, label };
+        elements.deleteModalMessage.innerHTML = `Are you sure you want to delete <strong>${escapeHtml(label)}</strong> (ID #${escapeHtml(id)}) from the Oracle Database?`;
+        elements.modalConfirmDelete.classList.add('open');
+      }
+
+      function closeDeleteModal() {
+        state.deleteTarget = null;
+        elements.modalConfirmDelete.classList.remove('open');
+      }
+
+      async function executeDelete() {
+        if (!state.deleteTarget) return;
+        const { type, id, label } = state.deleteTarget;
+        const endpoint = type === 'teacher' ? `/api/teachers/${id}` : `/api/rooms/${id}`;
+
+        try {
+          const res = await fetch(endpoint, { method: 'DELETE' });
+          const json = await res.json();
+          closeDeleteModal();
+
+          if (json.success) {
+            showToast(`${type === 'teacher' ? 'Faculty record' : 'Room'} deleted successfully`, 'success');
+            await refreshAll();
+          } else {
+            showToast(json.error || 'Deletion failed', 'error');
+          }
+        } catch (err) {
+          showToast('Network error during deletion', 'error');
+        }
+      }
+
+      // Tab navigation
+      elements.tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          setActiveTab(btn.getAttribute('data-tab'));
+        });
+      });
+
+      // Filter & Search events (Teachers)
+      let teacherSearchTimer;
+      elements.teacherSearchInput.addEventListener('input', () => {
+        clearTimeout(teacherSearchTimer);
+        teacherSearchTimer = setTimeout(loadTeachers, 250);
+      });
+      elements.teacherDeptFilter.addEventListener('change', loadTeachers);
+
+      // Filter & Search events (Rooms)
+      let roomSearchTimer;
+      elements.roomSearchInput.addEventListener('input', () => {
+        clearTimeout(roomSearchTimer);
+        roomSearchTimer = setTimeout(loadRooms, 250);
+      });
+      elements.roomBuildingFilter.addEventListener('change', loadRooms);
+      elements.roomTypeFilter.addEventListener('change', loadRooms);
+
+      // LocalStorage Draft Auto-Save System
+      const DRAFT_KEYS = {
+        TEACHER: 'uni_draft_teacher',
+        ROOM: 'uni_draft_room'
+      };
+
+      function saveTeacherDraft() {
+        if (state.editingTeacherId) return;
+        const draft = {
+          FIRST_NAME: elements.inputTeacherFirst.value,
+          LAST_NAME: elements.inputTeacherLast.value,
+          DEPARTMENT: elements.inputTeacherDept.value,
+          EMAIL: elements.inputTeacherEmail.value,
+          PHONE: elements.inputTeacherPhone.value,
+          HIRE_DATE: elements.inputTeacherHireDate.value,
+          SALARY: elements.inputTeacherSalary.value,
+          TEACHER_ID: elements.inputTeacherId.value
+        };
+        const hasContent = Object.values(draft).some(val => val && String(val).trim().length > 0);
+        try {
+          if (hasContent) {
+            localStorage.setItem(DRAFT_KEYS.TEACHER, JSON.stringify(draft));
+          } else {
+            localStorage.removeItem(DRAFT_KEYS.TEACHER);
+          }
+        } catch (err) {
+          console.warn('LocalStorage draft save error:', err);
+        }
+      }
+
+      function restoreTeacherDraft() {
+        if (state.editingTeacherId) return false;
+        try {
+          const raw = localStorage.getItem(DRAFT_KEYS.TEACHER);
+          if (!raw) return false;
+          const draft = JSON.parse(raw);
+          if (!draft) return false;
+
+          let restoredAny = false;
+          if (draft.FIRST_NAME) { elements.inputTeacherFirst.value = draft.FIRST_NAME; restoredAny = true; }
+          if (draft.LAST_NAME) { elements.inputTeacherLast.value = draft.LAST_NAME; restoredAny = true; }
+          if (draft.DEPARTMENT) { elements.inputTeacherDept.value = draft.DEPARTMENT; restoredAny = true; }
+          if (draft.EMAIL) { elements.inputTeacherEmail.value = draft.EMAIL; restoredAny = true; }
+          if (draft.PHONE) { elements.inputTeacherPhone.value = draft.PHONE; restoredAny = true; }
+          if (draft.HIRE_DATE) { elements.inputTeacherHireDate.value = draft.HIRE_DATE; restoredAny = true; }
+          if (draft.SALARY) { elements.inputTeacherSalary.value = draft.SALARY; restoredAny = true; }
+          if (draft.TEACHER_ID) { elements.inputTeacherId.value = draft.TEACHER_ID; restoredAny = true; }
+
+          if (restoredAny && elements.teacherDraftNotice) {
+            elements.teacherDraftNotice.style.display = 'flex';
+          }
+          return restoredAny;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      function clearTeacherDraft() {
+        try {
+          localStorage.removeItem(DRAFT_KEYS.TEACHER);
+        } catch (err) {}
+        if (elements.teacherDraftNotice) {
+          elements.teacherDraftNotice.style.display = 'none';
+        }
+      }
+
+      function saveRoomDraft() {
+        const draft = {
+          ROOM_NUMBER: elements.inputRoomNumber.value,
+          BUILDING: elements.inputRoomBuilding.value,
+          ROOM_TYPE: elements.inputRoomType.value,
+          CAPACITY: elements.inputRoomCapacity.value,
+          ROOM_ID: elements.inputRoomId.value
+        };
+        const hasContent = (draft.ROOM_NUMBER && draft.ROOM_NUMBER.trim().length > 0) ||
+                           (draft.BUILDING && draft.BUILDING.trim().length > 0) ||
+                           (draft.CAPACITY && String(draft.CAPACITY).trim().length > 0) ||
+                           (draft.ROOM_ID && String(draft.ROOM_ID).trim().length > 0);
+        try {
+          if (hasContent) {
+            localStorage.setItem(DRAFT_KEYS.ROOM, JSON.stringify(draft));
+          } else {
+            localStorage.removeItem(DRAFT_KEYS.ROOM);
+          }
+        } catch (err) {
+          console.warn('LocalStorage draft save error:', err);
+        }
+      }
+
+      function restoreRoomDraft() {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEYS.ROOM);
+          if (!raw) return false;
+          const draft = JSON.parse(raw);
+          if (!draft) return false;
+
+          let restoredAny = false;
+          if (draft.ROOM_NUMBER) { elements.inputRoomNumber.value = draft.ROOM_NUMBER; restoredAny = true; }
+          if (draft.BUILDING) { elements.inputRoomBuilding.value = draft.BUILDING; restoredAny = true; }
+          if (draft.ROOM_TYPE) { elements.inputRoomType.value = draft.ROOM_TYPE; }
+          if (draft.CAPACITY) { elements.inputRoomCapacity.value = draft.CAPACITY; restoredAny = true; }
+          if (draft.ROOM_ID) { elements.inputRoomId.value = draft.ROOM_ID; restoredAny = true; }
+
+          if (restoredAny && elements.roomDraftNotice) {
+            elements.roomDraftNotice.style.display = 'flex';
+          }
+          return restoredAny;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      function clearRoomDraft() {
+        try {
+          localStorage.removeItem(DRAFT_KEYS.ROOM);
+        } catch (err) {}
+        if (elements.roomDraftNotice) {
+          elements.roomDraftNotice.style.display = 'none';
+        }
+      }
+
+      // Input listeners for auto-save
+      elements.formAddTeacher.addEventListener('input', saveTeacherDraft);
+      elements.formAddTeacher.addEventListener('change', saveTeacherDraft);
+      elements.formAddRoom.addEventListener('input', saveRoomDraft);
+      elements.formAddRoom.addEventListener('change', saveRoomDraft);
+
+      // Discard draft buttons
+      if (elements.btnClearTeacherDraft) {
+        elements.btnClearTeacherDraft.addEventListener('click', () => {
+          clearTeacherDraft();
+          elements.formAddTeacher.reset();
+          elements.inputTeacherHireDate.value = new Date().toISOString().split('T')[0];
+          showToast('Faculty draft discarded', 'info', 2000);
+        });
+      }
+
+      if (elements.btnClearRoomDraft) {
+        elements.btnClearRoomDraft.addEventListener('click', () => {
+          clearRoomDraft();
+          elements.formAddRoom.reset();
+          showToast('Room draft discarded', 'info', 2000);
+        });
+      }
+
+      // Open Edit Teacher Modal (Populates form from selected row)
+      function openEditTeacherModal(teacherId) {
+        const teacher = state.teachers.find(t => String(t.TEACHER_ID) === String(teacherId));
+        if (!teacher) {
+          showToast(`Faculty record ID #${teacherId} not found`, 'error');
+          return;
+        }
+
+        state.editingTeacherId = teacher.TEACHER_ID;
+        if (elements.teacherDraftNotice) elements.teacherDraftNotice.style.display = 'none';
+        elements.modalTeacherTitle.textContent = `Edit Faculty Member (ID #${teacher.TEACHER_ID})`;
+        elements.btnSubmitTeacher.textContent = 'Update Faculty';
+
+        elements.inputTeacherFirst.value = teacher.FIRST_NAME || '';
+        elements.inputTeacherLast.value = teacher.LAST_NAME || '';
+        elements.inputTeacherDept.value = teacher.DEPARTMENT || '';
+        elements.inputTeacherEmail.value = teacher.EMAIL || '';
+        elements.inputTeacherPhone.value = teacher.PHONE || '';
+        elements.inputTeacherHireDate.value = teacher.HIRE_DATE || '';
+        elements.inputTeacherSalary.value = (teacher.SALARY !== null && teacher.SALARY !== undefined) ? teacher.SALARY : '';
+        elements.inputTeacherId.value = teacher.TEACHER_ID;
+        elements.inputTeacherId.disabled = true;
+
+        elements.modalAddTeacher.classList.add('open');
+        elements.inputTeacherFirst.focus();
+      }
+
+      // Add Teacher Modal controls
+      elements.btnOpenAddTeacher.addEventListener('click', () => {
+        state.editingTeacherId = null;
+        elements.modalTeacherTitle.textContent = 'Add New Faculty Member';
+        elements.btnSubmitTeacher.textContent = 'Save Faculty';
+        elements.inputTeacherId.disabled = false;
+        elements.formAddTeacher.reset();
+        elements.inputTeacherHireDate.value = new Date().toISOString().split('T')[0];
+        if (elements.teacherDraftNotice) elements.teacherDraftNotice.style.display = 'none';
+
+        const restored = restoreTeacherDraft();
+        elements.modalAddTeacher.classList.add('open');
+        elements.inputTeacherFirst.focus();
+        if (restored) {
+          showToast('Restored unsaved faculty draft', 'info', 2500);
+        }
+      });
+
+      const closeTeacherModal = () => {
+        state.editingTeacherId = null;
+        elements.inputTeacherId.disabled = false;
+        if (elements.teacherDraftNotice) elements.teacherDraftNotice.style.display = 'none';
+        elements.modalAddTeacher.classList.remove('open');
+      };
+      elements.btnCloseTeacherModal.addEventListener('click', closeTeacherModal);
+      elements.btnCancelTeacherModal.addEventListener('click', closeTeacherModal);
+
+      // Submit Teacher Form (Create via POST or Update via PUT)
+      elements.formAddTeacher.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const isEditing = Boolean(state.editingTeacherId);
+        const payload = {
+          FIRST_NAME: elements.inputTeacherFirst.value.trim(),
+          LAST_NAME: elements.inputTeacherLast.value.trim(),
+          DEPARTMENT: elements.inputTeacherDept.value.trim(),
+          EMAIL: elements.inputTeacherEmail.value.trim() || undefined,
+          PHONE: elements.inputTeacherPhone.value.trim() || undefined,
+          HIRE_DATE: elements.inputTeacherHireDate.value || undefined,
+          SALARY: elements.inputTeacherSalary.value ? parseFloat(elements.inputTeacherSalary.value) : undefined
+        };
+
+        if (!isEditing) {
+          payload.TEACHER_ID = elements.inputTeacherId.value ? parseInt(elements.inputTeacherId.value, 10) : undefined;
+        }
+
+        const url = isEditing ? `/api/teachers/${state.editingTeacherId}` : '/api/teachers';
+        const method = isEditing ? 'PUT' : 'POST';
+
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            if (!isEditing) {
+              clearTeacherDraft();
+            }
+            closeTeacherModal();
+            showToast(`${isEditing ? 'Updated' : 'Added'} faculty ${payload.FIRST_NAME} ${payload.LAST_NAME} successfully!`, 'success');
+            await refreshAll();
+          } else {
+            showToast(json.error || `Failed ${isEditing ? 'updating' : 'adding'} teacher`, 'error');
+          }
+        } catch (err) {
+          showToast(`Network error while ${isEditing ? 'updating' : 'saving'} teacher`, 'error');
+        }
+      });
+
+      // Add Room Modal controls
+      elements.btnOpenAddRoom.addEventListener('click', () => {
+        elements.formAddRoom.reset();
+        if (elements.roomDraftNotice) elements.roomDraftNotice.style.display = 'none';
+        const restored = restoreRoomDraft();
+        elements.modalAddRoom.classList.add('open');
+        elements.inputRoomNumber.focus();
+        if (restored) {
+          showToast('Restored unsaved room draft', 'info', 2500);
+        }
+      });
+
+      const closeRoomModal = () => {
+        if (elements.roomDraftNotice) elements.roomDraftNotice.style.display = 'none';
+        elements.modalAddRoom.classList.remove('open');
+      };
+      elements.btnCloseRoomModal.addEventListener('click', closeRoomModal);
+      elements.btnCancelRoomModal.addEventListener('click', closeRoomModal);
+
+      // Submit Room Form
+      elements.formAddRoom.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+          ROOM_NUMBER: elements.inputRoomNumber.value.trim(),
+          BUILDING: elements.inputRoomBuilding.value.trim(),
+          ROOM_TYPE: elements.inputRoomType.value,
+          CAPACITY: parseInt(elements.inputRoomCapacity.value, 10),
+          ROOM_ID: elements.inputRoomId.value ? parseInt(elements.inputRoomId.value, 10) : undefined
+        };
+
+        try {
+          const res = await fetch('/api/rooms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const json = await res.json();
+
+          if (json.success) {
+            clearRoomDraft();
+            closeRoomModal();
+            showToast(`Added Room ${payload.ROOM_NUMBER} (${payload.BUILDING}) successfully!`, 'success');
+            await refreshAll();
+          } else {
+            showToast(json.error || 'Failed adding room', 'error');
+          }
+        } catch (err) {
+          showToast('Network error while saving room', 'error');
+        }
+      });
+
+      // Global Keyboard Shortcuts (Alt+T, Alt+R, Alt+N, Alt+D, Escape)
+      window.addEventListener('keydown', (e) => {
+        if (e.altKey && !e.ctrlKey && !e.metaKey) {
+          const key = e.key.toLowerCase();
+          if (key === 't') {
+            e.preventDefault();
+            setActiveTab('teachers');
+            showToast('Faculty Directory (Alt+T)', 'info', 1500);
+          } else if (key === 'r') {
+            e.preventDefault();
+            setActiveTab('rooms');
+            showToast('Classrooms & Labs (Alt+R)', 'info', 1500);
+          } else if (key === 'n') {
+            e.preventDefault();
+            elements.btnOpenAddTeacher.click();
+            showToast('Add Faculty Member (Alt+N)', 'info', 1500);
+          } else if (key === 'd') {
+            e.preventDefault();
+            setActiveTab('database');
+            showToast('Oracle Database Explorer (Alt+D)', 'info', 1500);
+          } else if (key === 'u') {
+            e.preventDefault();
+            if (elements.btnHeaderBulkUpload) elements.btnHeaderBulkUpload.click();
+            showToast('Bulk Upload CSV (Alt+U)', 'info', 1500);
+          }
+        } else if (e.key === 'Escape') {
+          if (elements.modalAddTeacher.classList.contains('open')) {
+            closeTeacherModal();
+          } else if (elements.modalAddRoom.classList.contains('open')) {
+            closeRoomModal();
+          } else if (elements.modalConfirmDelete.classList.contains('open')) {
+            closeDeleteModal();
+          } else if (elements.modalBulkUpload && elements.modalBulkUpload.classList.contains('open')) {
+            closeBulkUploadModal();
+          }
+        }
+      });
+
+      // Delegated Table Click for Edit and Delete Buttons
+      elements.teachersTbody.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('button[data-action="edit-teacher"]');
+        if (editBtn) {
+          const id = editBtn.getAttribute('data-id');
+          openEditTeacherModal(id);
+          return;
+        }
+
+        const delBtn = e.target.closest('button[data-action="delete-teacher"]');
+        if (delBtn) {
+          const id = delBtn.getAttribute('data-id');
+          const name = delBtn.getAttribute('data-name');
+          openDeleteModal('teacher', id, name);
+        }
+      });
+
+      elements.roomsTbody.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action="delete-room"]');
+        if (btn) {
+          const id = btn.getAttribute('data-id');
+          const name = btn.getAttribute('data-name');
+          openDeleteModal('room', id, name);
+        }
+      });
+
+      // Delete confirmation modal listeners
+      elements.btnConfirmDelete.addEventListener('click', executeDelete);
+      elements.btnCancelDelete.addEventListener('click', closeDeleteModal);
+      elements.btnCloseDeleteModal.addEventListener('click', closeDeleteModal);
+
+      // Action bar buttons
+      if (elements.btnExportTeachersCsv) {
+        elements.btnExportTeachersCsv.addEventListener('click', handleExportTeachers);
+      }
+      if (elements.btnExportRoomsCsv) {
+        elements.btnExportRoomsCsv.addEventListener('click', handleExportRooms);
+      }
+      elements.btnReseedDb.addEventListener('click', triggerReseed);
+      elements.btnReseedFromDbView.addEventListener('click', triggerReseed);
+      elements.btnRefreshAll.addEventListener('click', async () => {
+        await refreshAll();
+        showToast('Console data refreshed', 'info', 2000);
+      });
+
+      // =======================================================================
+      // Authentication System (Username: admin | Password: 123456)
+      // =======================================================================
+      const AUTH_STORAGE_KEY = 'uni_auth_session_v1';
+
+      function getStoredAuth() {
+        try {
+          const local = localStorage.getItem(AUTH_STORAGE_KEY);
+          if (local) return JSON.parse(local);
+          const session = sessionStorage.getItem(AUTH_STORAGE_KEY);
+          if (session) return JSON.parse(session);
+        } catch (e) {
+          console.warn('Auth token read error:', e);
+        }
+        return null;
+      }
+
+      function showLoginError(msg) {
+        if (elements.loginErrorMsg) elements.loginErrorMsg.textContent = msg;
+        if (elements.loginErrorAlert) elements.loginErrorAlert.style.display = 'flex';
+        const card = document.querySelector('.login-container');
+        if (card) {
+          card.classList.remove('shake');
+          void card.offsetWidth; // Trigger reflow to replay CSS animation
+          card.classList.add('shake');
+        }
+      }
+
+      function applyAuthState(authData, rememberMe = true) {
+        state.isAuthenticated = true;
+        state.user = authData.user || {
+          username: 'admin',
+          role: 'Administrator',
+          displayName: 'System Admin'
+        };
+
+        try {
+          if (rememberMe) {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+            sessionStorage.removeItem(AUTH_STORAGE_KEY);
+          } else {
+            sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+          }
+        } catch (e) {}
+
+        if (elements.sidebarUserName) elements.sidebarUserName.textContent = state.user.username || 'admin';
+        if (elements.sidebarUserRole) elements.sidebarUserRole.textContent = `Role: ${state.user.role || 'Administrator'}`;
+
+        // Switch visible view
+        elements.loginScreen.style.display = 'none';
+        elements.appLayout.style.display = 'flex';
+
+        // Load console data
+        refreshAll();
+      }
+
+      function executeLogout() {
+        state.isAuthenticated = false;
+        state.user = null;
+
+        try {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          sessionStorage.removeItem(AUTH_STORAGE_KEY);
+        } catch (e) {}
+
+        elements.appLayout.style.display = 'none';
+        elements.loginScreen.style.display = 'flex';
+        elements.loginPassword.value = '';
+        if (elements.loginErrorAlert) elements.loginErrorAlert.style.display = 'none';
+        if (elements.loginUsername) elements.loginUsername.focus();
+
+        showToast('You have signed out of the Administrator Console.', 'info', 2500);
+      }
+
+      // Login Form Submission
+      if (elements.formLogin) {
+        elements.formLogin.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const username = elements.loginUsername.value.trim();
+          const password = elements.loginPassword.value;
+          const rememberMe = elements.loginRememberMe ? elements.loginRememberMe.checked : true;
+
+          if (!username || !password) {
+            showLoginError('Please enter both username and password.');
+            return;
+          }
+
+          if (elements.loginErrorAlert) elements.loginErrorAlert.style.display = 'none';
+          elements.btnSubmitLogin.disabled = true;
+          elements.btnSubmitLogin.innerHTML = '<span>⏳</span> Verifying credentials...';
+
+          try {
+            const res = await fetch('/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              showToast('Authentication successful! Welcome, Admin.', 'success', 2500);
+              applyAuthState(data, rememberMe);
+            } else {
+              showLoginError(data.error || 'Invalid username or password. Please try again.');
+            }
+          } catch (err) {
+            // Client-side fallback check if server response fails
+            if (username === 'admin' && password === '123456') {
+              const fallbackAuth = {
+                success: true,
+                token: 'admin-local-fallback-token',
+                user: {
+                  username: 'admin',
+                  role: 'Administrator',
+                  displayName: 'System Admin'
+                }
+              };
+              showToast('Authentication successful! Welcome, Admin.', 'success', 2500);
+              applyAuthState(fallbackAuth, rememberMe);
+            } else {
+              showLoginError('Invalid username or password. Please try again.');
+            }
+          } finally {
+            elements.btnSubmitLogin.disabled = false;
+            elements.btnSubmitLogin.innerHTML = '<span>Sign In to Console</span> <span>&rarr;</span>';
+          }
+        });
+      }
+
+      // Toggle Password Visibility
+      if (elements.btnTogglePassword) {
+        elements.btnTogglePassword.addEventListener('click', () => {
+          const isPassword = elements.loginPassword.type === 'password';
+          elements.loginPassword.type = isPassword ? 'text' : 'password';
+          elements.btnTogglePassword.innerHTML = isPassword ? '🙈' : '👁️';
+          elements.btnTogglePassword.setAttribute('title', isPassword ? 'Hide password' : 'Show password');
+        });
+      }
+
+      // Logout handlers
+      if (elements.btnHeaderLogout) {
+        elements.btnHeaderLogout.addEventListener('click', executeLogout);
+      }
+      if (elements.btnSidebarLogout) {
+        elements.btnSidebarLogout.addEventListener('click', executeLogout);
+      }
+
+      // ============================================================================
+      // Bulk CSV Import System (Faculty & Rooms)
+      // ============================================================================
+      const bulkUploadState = {
+        targetType: 'teachers',
+        selectedFile: null,
+        parsedHeaders: [],
+        parsedRecords: [],
+        isUploading: false
+      };
+
+      // Robust CSV String Parser
+      function parseCsvString(text) {
+        let str = text.replace(/^\uFEFF/, '');
+        const rows = [];
+        let currentRow = [];
+        let currentVal = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < str.length; i++) {
+          const char = str[i];
+          const nextChar = str[i + 1];
+
+          if (inQuotes) {
+            if (char === '"' && nextChar === '"') {
+              currentVal += '"';
+              i++;
+            } else if (char === '"') {
+              inQuotes = false;
+            } else {
+              currentVal += char;
+            }
+          } else {
+            if (char === '"') {
+              inQuotes = true;
+            } else if (char === ',') {
+              currentRow.push(currentVal.trim());
+              currentVal = '';
+            } else if (char === '\r') {
+              if (nextChar === '\n') i++;
+              currentRow.push(currentVal.trim());
+              if (currentRow.some(c => c.length > 0)) rows.push(currentRow);
+              currentRow = [];
+              currentVal = '';
+            } else if (char === '\n') {
+              currentRow.push(currentVal.trim());
+              if (currentRow.some(c => c.length > 0)) rows.push(currentRow);
+              currentRow = [];
+              currentVal = '';
+            } else {
+              currentVal += char;
+            }
+          }
+        }
+        if (currentVal || currentRow.length > 0) {
+          currentRow.push(currentVal.trim());
+          if (currentRow.some(c => c.length > 0)) rows.push(currentRow);
+        }
+
+        if (rows.length === 0) return { headers: [], records: [] };
+
+        const headers = rows[0].map(h => h.trim());
+        const records = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (row.length === 0 || row.every(val => !val)) continue;
+          const obj = {};
+          headers.forEach((h, colIndex) => {
+            obj[h] = row[colIndex] !== undefined ? row[colIndex] : '';
+          });
+          records.push(obj);
+        }
+
+        return { headers, records };
+      }
+
+      // Download Sample CSV Templates
+      function downloadCsvTemplate(type) {
+        let filename = '';
+        let csvContent = '';
+
+        if (type === 'teachers') {
+          filename = 'faculty_import_template.csv';
+          csvContent = 'FIRST_NAME,LAST_NAME,DEPARTMENT,EMAIL,PHONE,HIRE_DATE,SALARY\n' +
+            'Donald,Knuth,Computer Science,d.knuth@university.edu,555-0109,2021-03-15,112000\n' +
+            'Claude,Shannon,Mathematics,c.shannon@university.edu,555-0110,2022-01-10,106000\n' +
+            'Rosalind,Franklin,Physics,r.franklin@university.edu,555-0111,2020-09-01,98000';
+        } else {
+          filename = 'rooms_import_template.csv';
+          csvContent = 'ROOM_NUMBER,BUILDING,ROOM_TYPE,CAPACITY\n' +
+            '302A,Tesla Pavilion,Engineering Lab,45\n' +
+            '205,Euler Hall,Classroom,35\n' +
+            'Auditorium B,Curie Science Center,Auditorium,300\n' +
+            '114,Franklin Hall,Seminar Room,20';
+        }
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast(`Downloaded ${filename}`, 'info', 2000);
+      }
+
+      // Reset File Selection UI
+      function resetBulkFileSelection() {
+        bulkUploadState.selectedFile = null;
+        bulkUploadState.parsedHeaders = [];
+        bulkUploadState.parsedRecords = [];
+        if (elements.bulkFileInput) elements.bulkFileInput.value = '';
+
+        if (elements.bulkFileBanner) elements.bulkFileBanner.style.display = 'none';
+        if (elements.bulkPreviewSection) elements.bulkPreviewSection.style.display = 'none';
+        if (elements.bulkResultsBox) elements.bulkResultsBox.style.display = 'none';
+        if (elements.bulkDropzone) elements.bulkDropzone.style.display = 'block';
+
+        if (elements.btnExecuteBulkImport) {
+          elements.btnExecuteBulkImport.disabled = true;
+          elements.btnExecuteBulkImport.onclick = executeBulkImport;
+          elements.btnExecuteBulkImport.innerHTML = '<span>🚀</span> Start Import';
+        }
+      }
+
+      // Set Target Dataset (Faculty vs Rooms)
+      function setBulkTargetType(type) {
+        bulkUploadState.targetType = type;
+        if (type === 'teachers') {
+          elements.btnBulkTypeTeachers.classList.add('active');
+          elements.btnBulkTypeRooms.classList.remove('active');
+        } else {
+          elements.btnBulkTypeRooms.classList.add('active');
+          elements.btnBulkTypeTeachers.classList.remove('active');
+        }
+
+        if (bulkUploadState.parsedRecords.length > 0) {
+          renderBulkPreview();
+        }
+      }
+
+      // Render Data Preview & Validation
+      function renderBulkPreview() {
+        const { targetType, parsedHeaders, parsedRecords } = bulkUploadState;
+        if (!parsedRecords || parsedRecords.length === 0) {
+          resetBulkFileSelection();
+          return;
+        }
+
+        const lowerHeaders = parsedHeaders.map(h => h.toLowerCase());
+        let missingCols = [];
+        let rowIssues = 0;
+
+        if (targetType === 'teachers') {
+          const hasFirst = lowerHeaders.some(h => ['first_name', 'firstname', 'first', 'name'].includes(h));
+          const hasLast = lowerHeaders.some(h => ['last_name', 'lastname', 'last', 'surname'].includes(h));
+          if (!hasFirst) missingCols.push('FIRST_NAME');
+          if (!hasLast) missingCols.push('LAST_NAME');
+
+          for (const r of parsedRecords) {
+            const firstVal = r.FIRST_NAME || r.FirstName || r.firstname || r.FIRST || r.Name || r.name;
+            const lastVal = r.LAST_NAME || r.LastName || r.lastname || r.LAST || r.Surname || r.surname;
+            if (!firstVal || !lastVal) rowIssues++;
+          }
+        } else {
+          const hasRoom = lowerHeaders.some(h => ['room_number', 'room', 'roomnumber', 'number'].includes(h));
+          const hasBldg = lowerHeaders.some(h => ['building', 'bldg', 'hall'].includes(h));
+          if (!hasRoom) missingCols.push('ROOM_NUMBER');
+          if (!hasBldg) missingCols.push('BUILDING');
+
+          for (const r of parsedRecords) {
+            const roomVal = r.ROOM_NUMBER || r.Room || r.room || r.RoomNumber || r.roomnumber || r.NUMBER || r.number;
+            const bldgVal = r.BUILDING || r.Building || r.building || r.BLDG || r.bldg || r.HALL || r.hall;
+            if (!roomVal || !bldgVal) rowIssues++;
+          }
+        }
+
+        const displayHeaders = parsedHeaders.slice(0, 6);
+        let theadHtml = '<tr><th style="width: 45px;">#</th>';
+        for (const h of displayHeaders) {
+          theadHtml += `<th>${escapeHtml(h)}</th>`;
+        }
+        theadHtml += '</tr>';
+        elements.bulkPreviewThead.innerHTML = theadHtml;
+
+        const previewRows = parsedRecords.slice(0, 5);
+        let tbodyHtml = '';
+        previewRows.forEach((row, idx) => {
+          tbodyHtml += `<tr><td><strong>${idx + 1}</strong></td>`;
+          for (const h of displayHeaders) {
+            const val = row[h] !== undefined ? row[h] : '';
+            tbodyHtml += `<td>${escapeHtml(val)}</td>`;
+          }
+          tbodyHtml += '</tr>';
+        });
+        elements.bulkPreviewTbody.innerHTML = tbodyHtml;
+
+        elements.bulkPreviewTitle.textContent = `Preview Data (${previewRows.length} of ${parsedRecords.length} records)`;
+
+        if (missingCols.length > 0) {
+          elements.bulkStatusTag.className = 'bulk-status-tag warning';
+          elements.bulkStatusTag.textContent = 'Missing Columns';
+          elements.bulkValidationNotice.className = 'bulk-validation-notice warning';
+          elements.bulkValidationNotice.innerHTML = `⚠️ CSV is missing recommended columns: <strong>${missingCols.join(', ')}</strong>. You may switch to the other dataset above if this file was meant for ${targetType === 'teachers' ? 'Rooms' : 'Faculty'}.`;
+        } else if (rowIssues > 0) {
+          elements.bulkStatusTag.className = 'bulk-status-tag warning';
+          elements.bulkStatusTag.textContent = `${rowIssues} Incomplete`;
+          elements.bulkValidationNotice.className = 'bulk-validation-notice warning';
+          elements.bulkValidationNotice.innerHTML = `⚠️ Found ${rowIssues} record(s) with empty required values. Valid records will be imported; empty rows will be reported.`;
+        } else {
+          elements.bulkStatusTag.className = 'bulk-status-tag valid';
+          elements.bulkStatusTag.textContent = 'All Valid';
+          elements.bulkValidationNotice.className = 'bulk-validation-notice valid';
+          elements.bulkValidationNotice.innerHTML = `✅ Found <strong>${parsedRecords.length} valid records</strong> ready for insertion into the ${targetType === 'teachers' ? 'TEACHER' : 'ROOM'} table.`;
+        }
+
+        elements.bulkPreviewSection.style.display = 'block';
+        elements.btnExecuteBulkImport.disabled = false;
+        elements.btnExecuteBulkImport.innerHTML = `<span>🚀</span> Import ${parsedRecords.length} Records`;
+      }
+
+      // Handle File Selection
+      function handleBulkFile(file) {
+        if (!file) return;
+        if (!file.name.endsWith('.csv') && !file.type.includes('text') && !file.type.includes('csv')) {
+          showToast('Please upload a standard CSV file (.csv)', 'error');
+          return;
+        }
+
+        bulkUploadState.selectedFile = file;
+        const fileSizeKb = (file.size / 1024).toFixed(1);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const text = e.target.result;
+          const { headers, records } = parseCsvString(text);
+
+          if (headers.length === 0 || records.length === 0) {
+            showToast('The selected file has no records or valid headers.', 'error');
+            resetBulkFileSelection();
+            return;
+          }
+
+          bulkUploadState.parsedHeaders = headers;
+          bulkUploadState.parsedRecords = records;
+
+          const lowerH = headers.map(h => h.toLowerCase());
+          const looksLikeRooms = lowerH.some(h => ['room_number', 'room', 'roomnumber', 'number', 'capacity'].includes(h));
+          const looksLikeTeachers = lowerH.some(h => ['first_name', 'firstname', 'department', 'salary', 'hire_date'].includes(h));
+
+          if (looksLikeRooms && !looksLikeTeachers) {
+            setBulkTargetType('rooms');
+          } else if (looksLikeTeachers && !looksLikeRooms) {
+            setBulkTargetType('teachers');
+          }
+
+          elements.bulkFileName.textContent = file.name;
+          elements.bulkFileInfo.textContent = `${fileSizeKb} KB • ${records.length} records parsed (${headers.length} columns)`;
+          elements.bulkDropzone.style.display = 'none';
+          elements.bulkFileBanner.style.display = 'flex';
+          elements.bulkResultsBox.style.display = 'none';
+
+          renderBulkPreview();
+        };
+
+        reader.onerror = () => {
+          showToast('Failed to read file. Please try again.', 'error');
+          resetBulkFileSelection();
+        };
+
+        reader.readAsText(file);
+      }
+
+      // Open Bulk Upload Modal
+      function openBulkUploadModal(defaultType = 'teachers') {
+        resetBulkFileSelection();
+        setBulkTargetType(defaultType);
+        elements.modalBulkUpload.classList.add('open');
+      }
+
+      // Close Bulk Upload Modal
+      function closeBulkUploadModal() {
+        resetBulkFileSelection();
+        elements.modalBulkUpload.classList.remove('open');
+      }
+
+      // Execute Bulk Import to Backend API
+      async function executeBulkImport() {
+        const { targetType, parsedRecords } = bulkUploadState;
+        if (!parsedRecords || parsedRecords.length === 0) {
+          showToast('No records selected for import.', 'error');
+          return;
+        }
+
+        elements.btnExecuteBulkImport.disabled = true;
+        elements.btnExecuteBulkImport.innerHTML = '<span>⏳</span> Importing to Oracle Database...';
+
+        try {
+          const endpoint = targetType === 'teachers' ? '/api/teachers/bulk' : '/api/rooms/bulk';
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              records: parsedRecords,
+              skipDuplicates: true
+            })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            elements.bulkPreviewSection.style.display = 'none';
+            elements.bulkFileBanner.style.display = 'none';
+            elements.bulkDropzone.style.display = 'none';
+
+            elements.bulkResultsBox.style.display = 'block';
+            elements.bulkResultsTitle.textContent = `Import Complete! (${data.insertedCount} Added)`;
+            elements.bulkResultsSubtitle.textContent = data.message;
+
+            if (data.errors && data.errors.length > 0) {
+              elements.bulkResultsErrors.style.display = 'block';
+              elements.bulkErrorsUl.innerHTML = data.errors.map(err => `<li>${escapeHtml(err.reason || err)}</li>`).join('');
+            } else {
+              elements.bulkResultsErrors.style.display = 'none';
+            }
+
+            elements.btnExecuteBulkImport.innerHTML = '<span>✅</span> Done';
+            elements.btnExecuteBulkImport.disabled = false;
+            elements.btnExecuteBulkImport.onclick = () => {
+              closeBulkUploadModal();
+              elements.btnExecuteBulkImport.onclick = executeBulkImport;
+            };
+
+            showToast(`Bulk upload complete! ${data.insertedCount} ${targetType} imported.`, 'success', 3500);
+            refreshAll();
+          } else {
+            showToast(data.error || 'Bulk upload failed.', 'error');
+            elements.btnExecuteBulkImport.disabled = false;
+            elements.btnExecuteBulkImport.innerHTML = `<span>🚀</span> Retry Import (${parsedRecords.length})`;
+          }
+        } catch (err) {
+          showToast(`Network error: ${err.message}`, 'error');
+          elements.btnExecuteBulkImport.disabled = false;
+          elements.btnExecuteBulkImport.innerHTML = `<span>🚀</span> Retry Import (${parsedRecords.length})`;
+        }
+      }
+
+      // Attach Bulk Upload Event Listeners
+      if (elements.btnHeaderBulkUpload) {
+        elements.btnHeaderBulkUpload.addEventListener('click', () => {
+          openBulkUploadModal(state.activeTab === 'rooms' ? 'rooms' : 'teachers');
+        });
+      }
+
+      if (elements.btnBulkUploadTeachers) {
+        elements.btnBulkUploadTeachers.addEventListener('click', () => {
+          openBulkUploadModal('teachers');
+        });
+      }
+
+      if (elements.btnBulkUploadRooms) {
+        elements.btnBulkUploadRooms.addEventListener('click', () => {
+          openBulkUploadModal('rooms');
+        });
+      }
+
+      if (elements.btnCloseBulkModal) {
+        elements.btnCloseBulkModal.addEventListener('click', closeBulkUploadModal);
+      }
+
+      if (elements.btnCancelBulkModal) {
+        elements.btnCancelBulkModal.addEventListener('click', closeBulkUploadModal);
+      }
+
+      if (elements.btnBulkTypeTeachers) {
+        elements.btnBulkTypeTeachers.addEventListener('click', () => setBulkTargetType('teachers'));
+      }
+
+      if (elements.btnBulkTypeRooms) {
+        elements.btnBulkTypeRooms.addEventListener('click', () => setBulkTargetType('rooms'));
+      }
+
+      if (elements.btnDownloadTeacherTemplate) {
+        elements.btnDownloadTeacherTemplate.addEventListener('click', () => downloadCsvTemplate('teachers'));
+      }
+
+      if (elements.btnDownloadRoomTemplate) {
+        elements.btnDownloadRoomTemplate.addEventListener('click', () => downloadCsvTemplate('rooms'));
+      }
+
+      if (elements.btnRemoveBulkFile) {
+        elements.btnRemoveBulkFile.addEventListener('click', resetBulkFileSelection);
+      }
+
+      if (elements.bulkDropzone) {
+        elements.bulkDropzone.addEventListener('click', () => {
+          if (elements.bulkFileInput) elements.bulkFileInput.click();
+        });
+
+        elements.bulkDropzone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          elements.bulkDropzone.classList.add('dragover');
+        });
+
+        elements.bulkDropzone.addEventListener('dragleave', () => {
+          elements.bulkDropzone.classList.remove('dragover');
+        });
+
+        elements.bulkDropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          elements.bulkDropzone.classList.remove('dragover');
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleBulkFile(e.dataTransfer.files[0]);
+          }
+        });
+      }
+
+      if (elements.bulkFileInput) {
+        elements.bulkFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            handleBulkFile(e.target.files[0]);
+          }
+        });
+      }
+
+      if (elements.btnExecuteBulkImport) {
+        elements.btnExecuteBulkImport.addEventListener('click', executeBulkImport);
+      }
+
+      // Close modals when clicking backdrop
+      window.addEventListener('click', (e) => {
+        if (e.target === elements.modalAddTeacher) closeTeacherModal();
+        if (e.target === elements.modalAddRoom) closeRoomModal();
+        if (e.target === elements.modalConfirmDelete) closeDeleteModal();
+        if (e.target === elements.modalBulkUpload) closeBulkUploadModal();
+      });
+
+      // Initial Authentication Bootstrap
+      const existingAuth = getStoredAuth();
+      if (existingAuth && existingAuth.user && existingAuth.user.username === 'admin') {
+        applyAuthState(existingAuth, true);
+      } else {
+        elements.appLayout.style.display = 'none';
+        elements.loginScreen.style.display = 'flex';
+      }
+    })();
+  </script>
+</body>
+</html>
